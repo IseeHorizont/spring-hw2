@@ -4,6 +4,7 @@ import com.edu.ulab.app.entity.Person;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import javax.persistence.LockModeType;
 import java.util.Optional;
@@ -17,6 +18,6 @@ public interface UserRepository extends CrudRepository<Person, Long> {
      */
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select p from Person p where p.id = :id")
-    Optional<Person> findByIdForUpdate(long id);
+    @Query("select p from Person p where p.userId = :id")
+    Optional<Person> findByIdForUpdate(@Param("id") Long id);
 }
