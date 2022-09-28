@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +28,7 @@ import static com.edu.ulab.app.web.constant.WebConstant.RQID;
 @RestController
 @RequestMapping(value = WebConstant.VERSION_URL + "/user",
         produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Users", description = "User interaction")
 public class UserController {
     private final UserDataFacade userDataFacade;
 
@@ -35,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/create")
-    @Operation(summary = "Create user book row.",
+    @Operation(summary = "Create new user and his books",
             responses = {
                     @ApiResponse(description = "User book",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
