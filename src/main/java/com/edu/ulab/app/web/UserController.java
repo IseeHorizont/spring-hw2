@@ -8,19 +8,27 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import static com.edu.ulab.app.web.constant.WebConstant.REQUEST_ID_PATTERN;
 import static com.edu.ulab.app.web.constant.WebConstant.RQID;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping(value = WebConstant.VERSION_URL + "/user",
         produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Users", description = "User interaction")
 public class UserController {
     private final UserDataFacade userDataFacade;
 
@@ -29,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/create")
-    @Operation(summary = "Create user book row.",
+    @Operation(summary = "Create new user and his books",
             responses = {
                     @ApiResponse(description = "User book",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -42,6 +50,11 @@ public class UserController {
     }
 
     @PutMapping(value = "/update")
+    @Operation(summary = "Update user book.",
+            responses = {
+                    @ApiResponse(description = "User book",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UserBookResponse.class)))})
     public UserBookResponse updateUserWithBooks(@RequestBody UserBookRequest request) {
         UserBookResponse response = userDataFacade.updateUserWithBooks(request);
         log.info("Response with updated user and his books: {}", response);
@@ -49,14 +62,24 @@ public class UserController {
     }
 
     @GetMapping(value = "/get/{userId}")
-    public UserBookResponse updateUserWithBooks(@PathVariable Long userId) {
+    @Operation(summary = "Get user and his books by id.",
+            responses = {
+                    @ApiResponse(description = "User and his books",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UserBookResponse.class)))})
+    public UserBookResponse updateUserWithBooks(@PathVariable("userId") @NotNull Long userId) {
         UserBookResponse response = userDataFacade.getUserWithBooks(userId);
         log.info("Response with user and his books: {}", response);
         return response;
     }
 
     @DeleteMapping(value = "/delete/{userId}")
-    public void deleteUserWithBooks(@PathVariable Long userId) {
+    @Operation(summary = "Delete user and his books.",
+            responses = {
+                    @ApiResponse(description = "Deleted user count",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UserBookResponse.class)))})
+    public void deleteUserWithBooks(@PathVariable("userId") @NotBlank Long userId) {
         log.info("Delete user and his books:  userId {}", userId);
         userDataFacade.deleteUserWithBooks(userId);
     }

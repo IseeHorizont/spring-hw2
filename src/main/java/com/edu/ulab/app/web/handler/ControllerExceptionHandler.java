@@ -1,6 +1,8 @@
 package com.edu.ulab.app.web.handler;
 
+import com.edu.ulab.app.exception.BookServiceException;
 import com.edu.ulab.app.exception.NotFoundException;
+import com.edu.ulab.app.exception.UserServiceException;
 import com.edu.ulab.app.web.response.BaseWebResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,20 @@ public class ControllerExceptionHandler {
     public ResponseEntity<BaseWebResponse> handleNotFoundExceptionException(@NonNull final NotFoundException exc) {
         log.error(exc.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new BaseWebResponse(createErrorMessage(exc)));
+    }
+
+    @ExceptionHandler(UserServiceException.class)
+    public ResponseEntity<BaseWebResponse> handleUserServiceExceptionException(@NonNull final UserServiceException exc) {
+        log.error(exc.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new BaseWebResponse(createErrorMessage(exc)));
+    }
+
+    @ExceptionHandler(BookServiceException.class)
+    public ResponseEntity<BaseWebResponse> handleBookServiceExceptionException(@NonNull final BookServiceException exc) {
+        log.error(exc.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new BaseWebResponse(createErrorMessage(exc)));
     }
 
