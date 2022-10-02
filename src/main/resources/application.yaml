@@ -6,7 +6,7 @@ spring:
     init:
       mode: always
   datasource:
-    url: jdbc:postgresql://localhost:5433/mpl_ulab_edu
+    url: jdbc:postgresql://localhost:5433/ulab_edu
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
