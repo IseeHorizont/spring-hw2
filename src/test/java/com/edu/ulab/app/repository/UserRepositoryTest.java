@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
+import static com.vladmihalcea.sql.SQLStatementCountValidator.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Тесты репозитория {@link UserRepository}.
@@ -43,7 +45,15 @@ public class UserRepositoryTest {
         Person result = userRepository.save(person);
 
         //Then
-        assertThat(result.getAge()).isEqualTo(111);
+        assertNotNull(result);
+        assertThat(result.getFullName()).isEqualTo("Test name");
+        assertThat(result.getTitle()).isEqualTo("reader");
+        assertThat(result.getAge()).isEqualTo(30);
+
+        assertSelectCount(0);
+        assertInsertCount(1);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
     }
 
     @DisplayName("Updating user")
@@ -70,7 +80,13 @@ public class UserRepositoryTest {
         Person result = userRepository.save(updatedUser);
 
         // Then
+        assertNotNull(result);
         assertThat(result.getAge()).isEqualTo(updatedUser.getAge());
+
+        assertSelectCount(0);
+        assertInsertCount(2);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
     }
 
     @DisplayName("Getting user by id")
@@ -92,11 +108,15 @@ public class UserRepositoryTest {
         Person result = userRepository.findById(createdUser.getUserId()).get();
 
         // Then
+        assertNotNull(result);
         assertThat(result.getFullName()).isEqualTo(createdUser.getFullName());
         assertThat(result.getTitle()).isEqualTo(createdUser.getTitle());
         assertThat(result.getAge()).isEqualTo(createdUser.getAge());
-    }
 
+        assertInsertCount(1);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
+    }
 
     @DisplayName("Deleting user")
     @Test
@@ -119,5 +139,10 @@ public class UserRepositoryTest {
         // Then
         // count = 1, потому что в репо остался ещё один юзер
         assertThat(userRepository.count()).isEqualTo(1);
+
+        assertSelectCount(1);
+        assertInsertCount(1);
+        assertUpdateCount(0);
+        assertDeleteCount(1);
     }
 }

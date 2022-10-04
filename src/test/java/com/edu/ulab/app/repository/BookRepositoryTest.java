@@ -17,6 +17,7 @@ import java.util.List;
 import static com.vladmihalcea.sql.SQLStatementCountValidator.*;
 import static com.vladmihalcea.sql.SQLStatementCountValidator.assertDeleteCount;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Тесты репозитория {@link BookRepository}.
@@ -40,7 +41,7 @@ public class BookRepositoryTest {
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void insertUserAndBook() {
+    void insertUserAndBook_thenAssertDmlCount() {
         //Given
 
         Person person = new Person();
@@ -60,9 +61,13 @@ public class BookRepositoryTest {
         Book result = bookRepository.save(book);
 
         //Then
+        assertNotNull(result);
         assertThat(result.getPageCount()).isEqualTo(1000);
         assertThat(result.getTitle()).isEqualTo("test");
-        assertSelectCount(2);
+        assertSelectCount(0);
+        assertInsertCount(2);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
     }
 
     @DisplayName("Updating book")
@@ -95,9 +100,15 @@ public class BookRepositoryTest {
         Book result = bookRepository.save(updatedBook);
 
         // Then
+        assertNotNull(result);
         assertThat(result.getTitle()).isEqualTo(updatedBook.getTitle());
         assertThat(result.getAuthor()).isEqualTo(updatedBook.getAuthor());
         assertThat(result.getPageCount()).isEqualTo(updatedBook.getPageCount());
+
+        assertSelectCount(0);
+        assertInsertCount(2);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
     }
 
     @DisplayName("Getting book by user's id")
@@ -129,6 +140,10 @@ public class BookRepositoryTest {
         assertThat(foundBook.getTitle()).isEqualTo(book.getTitle());
         assertThat(foundBook.getAuthor()).isEqualTo(book.getAuthor());
         assertThat(foundBook.getPageCount()).isEqualTo(book.getPageCount());
+
+        assertInsertCount(1);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
     }
 
     @DisplayName("Getting all books by user's id")
@@ -158,8 +173,14 @@ public class BookRepositoryTest {
         List<Book> resultBooksList = bookRepository.findAllBooksByUserId(user.getUserId());
 
         // Then
+        assertNotNull(resultBooksList);
         assertThat(resultBooksList.size()).isEqualTo(1);
         assertThat(resultBooksList).isEqualTo(listWithRightBooks);
+
+        assertSelectCount(1);
+        assertInsertCount(1);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
     }
 
     @DisplayName("Deleting book by id")
@@ -188,6 +209,11 @@ public class BookRepositoryTest {
         // Then
         // count = 2, потому что в репо остались ещё две книги
         assertThat(bookRepository.count()).isEqualTo(2);
+
+        assertSelectCount(1);
+        assertInsertCount(1);
+        assertUpdateCount(0);
+        assertDeleteCount(1);
     }
 
 }
