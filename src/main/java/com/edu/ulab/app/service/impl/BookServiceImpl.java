@@ -49,6 +49,21 @@ public class BookServiceImpl implements BookService {
         return bookMapper.bookToBookDto(updatedBook);
     }
 
+    public BookDto updateBook(Long bookId, BookDto bookDto) {
+        Book currentBook = bookMapper.bookDtoToBook(bookDto);
+        log.info("Mapped book: {}", currentBook);
+
+        Book bookByIdFromDB = bookRepository.findByIdForUpdate(bookId)
+                .orElseThrow(() -> new BookServiceException("Book with id #" + bookId + " not found"));
+        log.info("Got book from DB for update: {}", bookByIdFromDB);
+
+        currentBook.setId(bookByIdFromDB.getId());
+        Book updatedBook = bookRepository.save(currentBook);
+        log.info("Updated book: {}", updatedBook);
+
+        return bookMapper.bookToBookDto(updatedBook);
+    }
+
     public List<BookDto> getAllBooksByUserId(Long userId) {
         log.info("Got user's id #{} to look for books", userId);
         List<Book> allBooksByUserId = bookRepository.findAllBooksByUserId(userId);
@@ -63,7 +78,7 @@ public class BookServiceImpl implements BookService {
     public BookDto getBookById(Long id) {
         log.info("Got book id #{}", id);
         Book foundBookById = bookRepository.findById(id)
-                .orElseThrow(() -> new BookServiceException("User with id #" + id + " not found")
+                .orElseThrow(() -> new BookServiceException("Book with id #" + id + " not found")
         );
         log.info("Found book by id #{}: {}", id, foundBookById);
         return bookMapper.bookToBookDto(foundBookById);
